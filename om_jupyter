@@ -1,0 +1,84 @@
+#!/usr/bin/bash
+
+# Define user id
+user_id="valmiki"
+# Name the script that sbatch will call
+sbatch_script="jupyter.sh"
+# Name the output file that sbatch will create
+out_file="jupyter.out"
+# Get script directory
+cd "$(dirname "$0")"
+local_script_dir="$(pwd)"
+# Remote directory
+remote_script_dir="/om2/user/$user_id/slurm_scripts"
+# Node wait timeout 
+timeout_limit=120
+# Define port used to login to JupyterLab on local computer
+local_port=$(($RANDOM % (65535 - 49152) + 49152))
+# Enter port used by JupyterLab container running on OpenMind
+remote_port=$(($RANDOM % (65535 - 49152) + 49152))
+
+job_id=""
+node_id=""
+node_status=""
+
+
+SCPSCRIPT() {
+    scp $local_script_dir/$sbatch_script $user_id@openmind.mit.edu:/om2/user/$user_id
+    ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $sbatch_script"
+}
+
+# Function definitions
+SUBMITJOB() {
+    echo "Starting VSCode Server"
+    local ret=$(ssh $user_id@openmind.mit.edu "cd /om2/user/$user_id && sbatch $@ --port=$remote_port $sbatch_script")
+    job_id=$(echo "$ret" | grep -oE '[0-9]+')
+    echo "Job $job_id submitted"
+}
+
+WAITFORNODE() {
+    for ((i = 0 ; i < timeout_limit ; i += 5 )); do
+        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id--format=%T --sort=-V --noheader")
+        if [ "$node_status" == "RUNNING" ]; then
+            return
+        fi
+        echo "Node not running, status: $node_status"
+        echo "Waiting 5s for node to run"
+        sleep 5
+    done
+}
+
+GETNODEID() {
+    node_id=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id --format=%N --sort=-V --noheader")
+}
+
+PRINTSERVER() {
+    echo "Printing server address"
+    server_address=$(ssh $user_id@openmind.mit.edu "grep -o \"http://127.0.0.1:$remote_port/lab?token=\S.*\" /om2/user/$user_id/$out_file | head -n 1")
+    echo ${server_address/$remote_port/$local_port}
+}
+
+TUNNEL() {
+    echo "Starting SSH tunnel to $node_id from local port $local_port to remote port $remote_port"
+    ssh -L $local_port:$node_id:$remote_port $user_id@openmind.mit.edu
+}
+
+# Call functions
+SCPSCRIPT
+SUBMITJOB "$@" # returns job_id
+WAITFORNODE # returns node_status
+if [ "$node_status" == "RUNNING" ]; then
+    GETNODEID # returns node_id
+    echo "Node $node_id is $nodestatus"
+    echo "Just give the server a few seconds to be ready"
+    sleep 15
+    PRINTSERVER
+    TUNNEL
+else
+    echo "Job $job_id request has timed out after 2 minutes"
+    om_cancel $user_id $job_id
+fi
+
+echo ""
+echo "If you lose connection to the server, run this command locally to kill the process:"
+echo "lsof -ti:2141 | xargs kill -9"
