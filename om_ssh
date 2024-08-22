@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+# This script is used to start the ssh service on Openmind
+
+source om_config.sh
+
+ssh $user_id@openmind.mit.edu

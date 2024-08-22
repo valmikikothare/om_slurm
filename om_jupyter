@@ -1,44 +1,31 @@
 #!/usr/bin/bash
 
-# Define user id
-user_id="valmiki"
-# Name the script that sbatch will call
-sbatch_script="jupyter.sh"
-# Name the output file that sbatch will create
-out_file="jupyter.out"
-# Get script directory
-cd "$(dirname "$0")"
-local_script_dir="$(pwd)"
-# Remote directory
-remote_script_dir="/om2/user/$user_id/slurm_scripts"
-# Node wait timeout 
-timeout_limit=120
-# Define port used to login to JupyterLab on local computer
-local_port=$(($RANDOM % (65535 - 49152) + 49152))
-# Enter port used by JupyterLab container running on OpenMind
-remote_port=$(($RANDOM % (65535 - 49152) + 49152))
+# Source the configuration variables
+source $(dirname "$0")/om_config.sh
 
+# Initialize function return variables
 job_id=""
 node_id=""
 node_status=""
 
 
 SCPSCRIPT() {
-    scp $local_script_dir/$sbatch_script $user_id@openmind.mit.edu:/om2/user/$user_id
-    ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $sbatch_script"
+    ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
+    scp -q $local_script_dir/$jupyter_script $user_id@openmind.mit.edu:$remote_script_dir
+    ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $jupyter_script"
 }
 
 # Function definitions
 SUBMITJOB() {
     echo "Starting VSCode Server"
-    local ret=$(ssh $user_id@openmind.mit.edu "cd /om2/user/$user_id && sbatch $@ --port=$remote_port $sbatch_script")
+    local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch $@ --output=$jupyter_out $jupyter_script --port=$remote_port")
     job_id=$(echo "$ret" | grep -oE '[0-9]+')
     echo "Job $job_id submitted"
 }
 
 WAITFORNODE() {
     for ((i = 0 ; i < timeout_limit ; i += 5 )); do
-        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id--format=%T --sort=-V --noheader")
+        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id --format=%T --sort=-V --noheader")
         if [ "$node_status" == "RUNNING" ]; then
             return
         fi
@@ -54,7 +41,7 @@ GETNODEID() {
 
 PRINTSERVER() {
     echo "Printing server address"
-    server_address=$(ssh $user_id@openmind.mit.edu "grep -o \"http://127.0.0.1:$remote_port/lab?token=\S.*\" /om2/user/$user_id/$out_file | head -n 1")
+    server_address=$(ssh $user_id@openmind.mit.edu "grep -o \"http://127.0.0.1:$remote_port/lab?token=\S.*\" $remote_script_dir/$jupyter_out | head -n 1")
     echo ${server_address/$remote_port/$local_port}
 }
 
@@ -69,16 +56,12 @@ SUBMITJOB "$@" # returns job_id
 WAITFORNODE # returns node_status
 if [ "$node_status" == "RUNNING" ]; then
     GETNODEID # returns node_id
-    echo "Node $node_id is $nodestatus"
+    echo "Node $node_id is $node_status"
     echo "Just give the server a few seconds to be ready"
-    sleep 15
+    sleep 30
     PRINTSERVER
     TUNNEL
 else
     echo "Job $job_id request has timed out after 2 minutes"
     om_cancel $user_id $job_id
 fi
-
-echo ""
-echo "If you lose connection to the server, run this command locally to kill the process:"
-echo "lsof -ti:2141 | xargs kill -9"

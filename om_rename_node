@@ -1,0 +1,37 @@
+#!/usr/bin/bash
+
+source $(dirname "$0")/om_config.sh
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 nodeXXX"
+    exit 1
+fi
+
+new_node=$1
+config_file="$HOME/.ssh/config"
+
+# Read in the file
+lines=$(cat "$config_file")
+
+# Find the line with the 3-digit code in it
+if [[ $lines =~ omnode ]]; then
+    # Replace the 3-digit code with the new one
+    lines=$(echo "$lines" | sed -E "s/HostName node[0-9]{3}/HostName $new_node/")
+else
+    echo "No existing omnode config found, adding one to your ~/.ssh/config file"
+    # Append the new configuration to the end of the file
+    new_config="
+
+Host omnode
+    HostName $new_node
+    ProxyJump om
+    ForwardX11Trusted yes
+    ForwardAgent yes
+    ForwardX11 yes
+    ForwardX11Trusted yes
+    User $user_id
+    "
+    lines+="$new_config"
+fi
+
+echo "$lines" > "$config_file"

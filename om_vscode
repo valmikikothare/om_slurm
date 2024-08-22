@@ -1,37 +1,30 @@
 #!/usr/bin/bash
 
-# Define user id
-user_id="valmiki"
-# Name the script that sbatch will call
-sbatch_script="vscode.sh"
-# Local directory
-cd "$(dirname "$0")"
-local_script_dir="$(pwd)"
-# Remote directory
-remote_script_dir="/om2/user/$user_id/slurm_scripts"
-# Node wait timeout 
-timeout_limit=120
+# Source the configuration variables
+source $(dirname "$0")/om_config.sh
 
+# Initialize function return variables
 job_id=""
 node_id=""
 node_status=""
 
 SCPSCRIPT() {
-    scp $local_script_dir/$sbatch_script $user_id@openmind.mit.edu:$remote_script_dir
-    ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $sbatch_script"
+    ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
+    scp -q $local_script_dir/$vscode_script $user_id@openmind.mit.edu:$remote_script_dir
+    ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $vscode_script"
 }
 
 # Function definitions
 SUBMITJOB() {
     echo "Starting VSCode Server"
-    local ret=$(ssh $user_id@openmind.mit.edu "cd /om2/user/$user_id/$remote_script_dir && sbatch $@ --port=$remote_$sbatch_script ")
+    local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch $@ $vscode_script")
     job_id=$(echo "$ret" | grep -oE '[0-9]+')
     echo "Job $job_id submitted"
 }
 
 WAITFORNODE() {
     for ((i = 0 ; i < timeout_limit ; i += 5 )); do
-        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id--format=%T --sort=-V --noheader")
+        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id --format=%T --sort=-V --noheader")
         if [ "$node_status" == "RUNNING" ]; then
             return
         fi
@@ -51,7 +44,7 @@ SUBMITJOB "$@" # returns job_id
 WAITFORNODE # returns node_status
 if [ "$node_status" == "RUNNING" ]; then
     GETNODEID # returns node_id
-    omnode_vscode.py $node_id
+    om_rename_node $node_id
     echo "Job $job_id on node $node_id is $node_status"
 else
     echo "Job $job_id request has timed out after 2 minutes"

@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Define default user id
-user_id="valmiki"
+source $(dirname "$0")/om_config.sh
 
 # Check if user id is provided
 if [ $# -eq 2 ]; then
@@ -14,5 +14,5 @@ else
     exit 1
 fi
 
-ssh $user_id@openmind.mit.edu "scancel $jobid"
-echo "Job $jobid cancelled"
+ssh $user_id@openmind.mit.edu "scancel $job_id"
+echo "Job $job_id cancelled"
