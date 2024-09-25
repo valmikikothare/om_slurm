@@ -4,4 +4,4 @@
 
 source om_config.sh
 
-ssh $user_id@openmind.mit.edu
+ssh -t $user_id@openmind.mit.edu "cd "$remote_initial_dir" ; bash --login"

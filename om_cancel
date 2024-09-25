@@ -14,5 +14,14 @@ else
     exit 1
 fi
 
-ssh $user_id@openmind.mit.edu "scancel $job_id"
-echo "Job $job_id cancelled"
+if [ "$job_id" = "all" ]; then
+    job_id=""
+fi
+
+ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
+
+if [ -z "$job_id" ]; then
+    echo "All jobs cancelled"
+else
+    echo "Job $job_id cancelled"
+fi

@@ -12,6 +12,8 @@ export jupyter_script="jupyter.sh"
 export jupyter_out="jupyter.out"
 # Local directory
 export local_script_dir="$(pwd)"
+# Remote initial direcotry
+export remote_initial_dir="/om2/user/$user_id"
 # Remote directory
 export remote_script_dir="/om2/user/$user_id/slurm_scripts"
 # Node wait timeout 
