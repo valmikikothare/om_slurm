@@ -2,6 +2,8 @@
 
 # This script is used to start the ssh service on Openmind
 
-source om_config.sh
+# Source the configuration variables
+root=$(dirname $(readlink -f $0))
+source $root/om_config.sh
 
-ssh -t $user_id@openmind.mit.edu "cd "$remote_initial_dir" ; bash --login"
+ssh -tX $user_id@openmind.mit.edu "cd "$remote_initial_dir" ; bash --login"
