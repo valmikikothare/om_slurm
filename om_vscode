@@ -18,7 +18,7 @@ SCPSCRIPT() {
 # Function definitions
 SUBMITJOB() {
     echo "Starting VSCode Server"
-    local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch $@ $vscode_script")
+    local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch -output=$vscode_out $@ $vscode_script")
     job_id=$(echo "$ret" | grep -oE '[0-9]+')
     echo "Job $job_id submitted"
 }

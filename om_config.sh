@@ -4,11 +4,13 @@
 root=$(dirname $(readlink -f $0))
 cd $root
 # Set the user_id
-export user_id="valmiki"
+export user_id=""
 # Name the sbatch script for vscode
 export vscode_script="vscode.sh"
 # Name the sbatch script for jupyter
 export jupyter_script="jupyter.sh"
+# Name the sbatch vscode output file
+export vscode_out="vscode.out"
 # Name the sbatch jupyter output file
 export jupyter_out="jupyter.out"
 # Local directory

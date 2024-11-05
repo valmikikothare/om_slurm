@@ -16,18 +16,31 @@ config_file="$HOME/.ssh/config"
 lines=$(cat "$config_file")
 
 # Find the line with the 3-digit code in it
-if [[ $lines =~ omnode ]]; then
+if [[ ! $lines =~ "Host om" ]]; then
+    echo "No existing om config found, adding one to your ~/.ssh/config file"
+    # Append the new configuration to the end of the file
+    new_config="
+Host om
+    HostName openmind.mit.edu
+    ForwardAgent yes
+    ForwardX11 yes
+    ForwardX11Trusted yes
+    User $user_id
+    "
+    lines+="$new_config"
+fi
+
+# Find the line with the 3-digit code in it
+if [[ $lines =~ "Host omnode" ]]; then
     # Replace the 3-digit code with the new one
     lines=$(echo "$lines" | sed -E "s/HostName node[0-9]{3}/HostName $new_node/")
 else
     echo "No existing omnode config found, adding one to your ~/.ssh/config file"
     # Append the new configuration to the end of the file
     new_config="
-
 Host omnode
     HostName $new_node
     ProxyJump om
-    ForwardX11Trusted yes
     ForwardAgent yes
     ForwardX11 yes
     ForwardX11Trusted yes

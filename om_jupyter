@@ -48,6 +48,7 @@ PRINTSERVER() {
 
 TUNNEL() {
     echo "Starting SSH tunnel to $node_id from local port $local_port to remote port $remote_port"
+    echo "Do not close this terminal window until you are done with the server"
     ssh -L $local_port:$node_id:$remote_port $user_id@openmind.mit.edu
 }
 
