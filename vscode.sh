@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #SBATCH -J vscode
 #SBATCH -t 08:00:00
 #SBATCH -N 1

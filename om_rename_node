@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Source the configuration variables
 root=$(dirname $(readlink -f $0))

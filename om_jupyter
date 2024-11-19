@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Source the configuration variables
 root=$(dirname $(readlink -f $0))
@@ -11,9 +11,9 @@ node_status=""
 
 
 SCPSCRIPT() {
-    ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
-    scp -q $local_script_dir/$jupyter_script $user_id@openmind.mit.edu:$remote_script_dir
-    ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $jupyter_script"
+    ssh $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
+    scp $local_script_dir/$jupyter_script $user_id@openmind.mit.edu:$remote_script_dir
+    ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $jupyter_script"
 }
 
 # Function definitions

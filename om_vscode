@@ -1,8 +1,9 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Source the configuration variables
 root=$(dirname $(readlink -f $0))
 source $root/om_config.sh
+pushd $root
 
 # Initialize function return variables
 job_id=""
@@ -51,3 +52,4 @@ else
     echo "Job $job_id request has timed out after 2 minutes"
     om_cancel $user_id $job_id
 fi
+popd

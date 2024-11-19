@@ -2,7 +2,6 @@
 
 # Set the directory where all scripts are located
 root=$(dirname $(readlink -f $0))
-cd $root
 # Set the user_id
 export user_id=""
 # Name the sbatch script for vscode
