@@ -2,6 +2,8 @@
 
 CLI tool to spin up OpenMind VSCode and Jupyter Slurm servers from your local machine and modify VSCode settings so you can connect to this server with the click of a button, all in one bash command.
 
+Inspired by https://github.mit.edu/prevosto/remote_notebook_scripts, which provides the same Jupyter Notebook functionality as well as a working example using [Singularity](https://docs.sylabs.io/guides/latest/user-guide/) to run the [CaImAn](https://github.com/flatironinstitute/CaImAn) toolbox.
+
 ## Installation
 
 1. Clone the repository:
