@@ -1,22 +1,21 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Source the configuration variables
-root=$(dirname $(readlink -f $0))
-source $root/om_config.sh
+script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
+source $script_dir/om_config.sh
 
 # Initialize function return variables
 job_id=""
 node_id=""
 node_status=""
 
-
+# Function definitions
 SCPSCRIPT() {
     ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
-    scp -q $local_script_dir/$jupyter_script $user_id@openmind.mit.edu:$remote_script_dir
+    scp -q $script_dir/$jupyter_script $user_id@openmind.mit.edu:$remote_script_dir
     ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $jupyter_script"
 }
 
-# Function definitions
 SUBMITJOB() {
     echo "Starting VSCode Server"
     local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch $@ --output=$jupyter_out $jupyter_script --port=$remote_port")

@@ -1,17 +1,14 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Source the configuration variables
-root=$(dirname $(readlink -f $0))
-source $root/om_config.sh
+script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
+source $script_dir/om_config.sh
 
 # Check if user id is provided
-if [ $# -eq 2 ]; then
-    user_id=$1
-    job_id=$2
-elif [ $# -eq 1 ]; then
+if [ $# -eq 1 ]; then
     job_id=$1
 else
-    echo "Usage: om_cancel [user_id] job_id"
+    echo "Usage: om_cancel job_id"
     exit 1
 fi
 

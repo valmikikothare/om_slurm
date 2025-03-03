@@ -1,8 +1,7 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-# Source the configuration variables
-root=$(dirname $(readlink -f $0))
-source $root/om_config.sh
+script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
+source $script_dir/om_config.sh
 
 if [ $# -ne 1 ]; then
     echo "Usage: $0 nodeXXX"
