@@ -1,7 +1,7 @@
 # Description: Configuration file for OpenMind scripts
 
 # Set the user_id
-export user_id="valmiki" 
+export user_id="" 
 if [ -z "$user_id" ]; then
     echo "Please set the user_id variable in om_config.sh"
     exit 1
