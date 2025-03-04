@@ -8,6 +8,7 @@ source $script_dir/om_config.sh
 if [ $# -eq 1 ]; then
     job_id=$1
 else
+    echo "Error: $0 takes exactly one argument"
     echo "Usage: om_cancel job_id"
     exit 1
 fi

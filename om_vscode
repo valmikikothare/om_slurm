@@ -49,5 +49,5 @@ if [ "$node_status" == "RUNNING" ]; then
     echo "Job $job_id on node $node_id is $node_status"
 else
     echo "Job $job_id request has timed out after 2 minutes"
-    om_cancel $user_id $job_id
+    om_cancel $job_id
 fi
