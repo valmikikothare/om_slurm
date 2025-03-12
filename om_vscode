@@ -2,7 +2,7 @@
 
 # Source the configuration variables
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
-source $script_dir/om_config.sh
+source $script_dir/constants.sh
 
 # Initialize function return variables
 job_id=""

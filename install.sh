@@ -2,7 +2,6 @@
 
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 
-
 echo "Installing om_server scripts to $HOME/.local/bin"
 
 for file in om_jupyter om_cancel om_rename_node om_ssh om_vscode om_queue; do
@@ -11,6 +10,9 @@ done
 
 # Create the .local/bin directory if it doesn't exist
 mkdir -p $HOME/.local/bin
+
+# Allow symbolic links in git bash
+MSYS=winsymlinks:nativestrict
 
 # Create symlinks to the om_server scripts in the .local/bin directory
 ln -sf $script_dir/om_jupyter $HOME/.local/bin/om_jupyter

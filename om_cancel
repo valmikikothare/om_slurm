@@ -2,25 +2,31 @@
 
 # Source the configuration variables
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
-source $script_dir/om_config.sh
+source $script_dir/constants.sh
 
-# Check if user id is provided
-if [ $# -eq 1 ]; then
-    job_id=$1
-else
-    echo "Error: $0 takes exactly one argument"
-    echo "Usage: om_cancel job_id"
+# Check if arguments are provided
+if [ $# -eq 0 ]; then
+    echo "Error: No arguments provided"
+    echo "Usage: om_cancel job_id [job_id ...] OR om_cancel --all"
     exit 1
 fi
 
-if [ "$job_id" = "all" ]; then
-    job_id=""
-fi
-
-ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
-
-if [ -z "$job_id" ]; then
-    echo "All jobs cancelled"
+# Check if --all flag is used
+if [[ "$*" == *"--all"* ]]; then
+    # Check if --all is the only argument
+    if [ $# -eq 1 ]; then
+        job_id=""
+        ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
+        echo "All jobs cancelled"
+    else
+        echo "Error: Cannot use --all with other job IDs"
+        echo "Usage: om_cancel job_id [job_id ...] OR om_cancel --all"
+        exit 1
+    fi
 else
-    echo "Job $job_id cancelled"
+    # Process multiple job IDs
+    for job_id in "$@"; do
+        ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
+        echo "Job $job_id cancelled"
+    done
 fi

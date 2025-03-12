@@ -3,6 +3,6 @@
 # This script is used to start the ssh service on Openmind
 
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
-source $script_dir/om_config.sh
+source $script_dir/constants.sh
 
 ssh -tX $user_id@openmind.mit.edu "cd "$remote_initial_dir" ; bash --login"
