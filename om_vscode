@@ -1,8 +1,8 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Source the configuration variables
-root=$(dirname $(readlink -f $0))
-source $root/om_config.sh
+script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
+source $script_dir/om_config.sh
 
 # Initialize function return variables
 job_id=""
@@ -11,7 +11,7 @@ node_status=""
 
 SCPSCRIPT() {
     ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
-    scp -q $local_script_dir/$vscode_script $user_id@openmind.mit.edu:$remote_script_dir
+    scp -q $script_dir/$vscode_script $user_id@openmind.mit.edu:$remote_script_dir
     ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $vscode_script"
 }
 
@@ -49,5 +49,5 @@ if [ "$node_status" == "RUNNING" ]; then
     echo "Job $job_id on node $node_id is $node_status"
 else
     echo "Job $job_id request has timed out after 2 minutes"
-    om_cancel $user_id $job_id
+    om_cancel $job_id
 fi

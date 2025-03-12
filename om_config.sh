@@ -1,10 +1,11 @@
 # Description: Configuration file for OpenMind scripts
 
-# Set the directory where all scripts are located
-root=$(dirname $(readlink -f $0))
-cd $root
 # Set the user_id
-export user_id=""
+export user_id="" 
+if [ -z "$user_id" ]; then
+    echo "Please set the user_id variable in om_config.sh"
+    exit 1
+fi
 # Name the sbatch script for vscode
 export vscode_script="vscode.sh"
 # Name the sbatch script for jupyter
@@ -13,8 +14,6 @@ export jupyter_script="jupyter.sh"
 export vscode_out="vscode.out"
 # Name the sbatch jupyter output file
 export jupyter_out="jupyter.out"
-# Local directory
-export local_script_dir=$root
 # Remote initial direcotry
 export remote_initial_dir="/om2/user/$user_id"
 # Remote directory
