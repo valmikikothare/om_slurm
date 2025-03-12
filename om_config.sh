@@ -1,11 +1,13 @@
 # Description: Configuration file for OpenMind scripts
 
-# Set the user_id
-export user_id="" 
-if [ -z "$user_id" ]; then
-    echo "Please set the user_id variable in om_config.sh"
+# Set the user that you use to login to OpenMind
+export remote_user=""
+if [ -z "$remote_user" ]; then
+    echo "Please set the remote_user variable in om_config.sh"
     exit 1
 fi
+# Remote server address
+export remote_login_server="openmind.mit.edu"
 # Name the sbatch script for vscode
 export vscode_script="vscode.sh"
 # Name the sbatch script for jupyter
@@ -15,9 +17,9 @@ export vscode_out="vscode.out"
 # Name the sbatch jupyter output file
 export jupyter_out="jupyter.out"
 # Remote initial direcotry
-export remote_initial_dir="/om2/user/$user_id"
+export remote_initial_dir="/om2/user/$remote_user"
 # Remote directory
-export remote_script_dir="/om2/user/$user_id/slurm_scripts"
+export remote_script_dir="/om2/user/$remote_user/slurm_scripts"
 # Node wait timeout 
 export timeout_limit=120
 # Define port used to login to JupyterLab on local computer

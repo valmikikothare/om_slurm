@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# This script is used to start the ssh service on Openmind
+set -e
 
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 source $script_dir/om_config.sh
 
-ssh -tX $user_id@openmind.mit.edu "cd "$remote_initial_dir" ; bash --login"
+ssh -tX $remote_user@$remote_login_server "cd $remote_initial_dir ; bash --login"

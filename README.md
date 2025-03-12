@@ -32,14 +32,14 @@ Before using the CLI tool, you need to modify the `om_config.sh` file to set up 
     ```bash
     nano om_config.sh
     ```
-2. Modify any variables as needed. For example, to set the `user_id` variable, you would update the line as follows:
+2. Modify any variables as needed. For example, to set the `remote_user` variable, you would update the line as follows:
     ```bash
-    export user_id="user123"
+    export remote_user="user123"
     ```
 3. Save and close the file.
 
 **Note:**
-You should only need to modify the `user_id` variable. The other variables are set to default values that should work for most users.
+You should only need to modify the `remote_user` variable. The other variables are set to default values that should work for most users.
 
 To override the default `sbatch` options, you can add command-line arguments to the `om_vscode` and `om_jupyter` commands (see Usage below).
 You can also change the default `sbatch` options by modifying `vscode.sh` and/or `jupyter.sh` to suit your resource needs. 
@@ -79,18 +79,51 @@ You must have Anaconda installed and initialized on OpenMind for the default `ju
 
 ### Rename a Node
 ```bash
-om_rename_node nodeXXX
+om_rename_node <nodeXXX>
 ```
-Replace `nodeXXX` with the desired node name. This command will update the SSH configuration for the specified node.
+Replace `<nodeXXX>` with the desired node name. This command will update the SSH configuration for the specified node.
 
 ### Cancel a Job
 ```bash
-om_cancel [user_id] job_id
+om_cancel [--all] <job_id>
 ```
-Replace `[user_id]` with your user ID and `job_id` with the job ID you want to cancel. If you only provide the `job_id`, it will use the default user ID from the configuration.
+Replace `<job_id>` with the job ID you want to cancel. If you provide the `--all` flag, all jobs for the remote user will be cancelled.
 
 ### SSH into Openmind
 ```bash
 om_ssh
 ```
-This command will start an SSH session to Openmind with the necessary configurations.
+This command will start an SSH session to the Openmind login node with the necessary configurations.
+
+## Troubleshooting
+
+Most commands will print a message to the terminal if they fail. 
+
+If `om_vscode` or `om_jupyter` succeeds, but you are unable to connect to the server, try the following:
+
+1. Check if the node is running with the `om_queue` command. 
+    1. If the node is not shown in the queue, the job may have been preempted or terminated.
+        - To check if it was a preemption, re-run `om_vscode` or `om_jupyter` to create a new node, then try connecting again.
+        - If this does not resolve the issue, check your `vscode.sh` or `jupyter.sh` files ensure that you have not made any modifications that might have caused the initialization to fail. To check the output of your job, try the following:
+            ```bash
+            om_ssh
+            cat <remote_script_dir>/vscode.out
+            ```
+            or
+            ```bash
+            om_ssh
+            cat <remote_script_dir>/jupyter.out
+            ```
+            where `<remote_script_dir>` is defined in `om_config.sh`.
+
+            If you see any error messages, try to resolve them by modifying your `vscode.sh` or `jupyter.sh` files.
+    2. If the node is shown in the queue, but you are unable to connect to the server, it may be an authentication issue. Try deleting the known hosts file as follows:
+        ```bash
+        rm ~/.ssh/known_hosts
+        ```
+        and try connecting again. 
+
+If you are still experiencing issues, please submit an issue on the [GitHub repository](https://github.com/valmikikothare/om_server/issues).
+
+
+
