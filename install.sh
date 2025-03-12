@@ -90,7 +90,7 @@ ln -sf $script_dir/om_queue $HOME/.local/bin/om_queue
 
 # Add the .local/bin directory to the PATH
 # Check if $HOME/.local/bin is already in the PATH
-if ! echo $PATH | grep -q "$HOME/.local/bin"; then
+if ! grep -q "export PATH=.*$HOME/.local/bin" ~/.bashrc; then
     echo "Adding $HOME/.local/bin to the PATH"
     echo "export PATH=\"$HOME/.local/bin:\$PATH\"" >> ~/.bashrc
 fi
