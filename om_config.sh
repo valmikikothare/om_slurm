@@ -16,9 +16,9 @@ export jupyter_script="jupyter.sh"
 export vscode_out="vscode.out"
 # Name the sbatch jupyter output file
 export jupyter_out="jupyter.out"
-# Remote initial direcotry
-export remote_initial_dir="/om2/user/$remote_user"
-# Remote directory
+# Initial remote directory (for `om_ssh` command)
+export remote_initial_dir="/home/$remote_user"
+# Remote script directory
 export remote_script_dir="/om2/user/$remote_user/slurm_scripts"
 # Node wait timeout 
 export timeout_limit=120
