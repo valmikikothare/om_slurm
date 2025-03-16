@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 source $script_dir/constants.sh
 
@@ -20,11 +22,11 @@ if [[ ! $lines =~ "Host om" ]]; then
     # Append the new configuration to the end of the file
     new_config="
 Host om
-    HostName openmind.mit.edu
+    HostName $remote_login_server
     ForwardAgent yes
     ForwardX11 yes
     ForwardX11Trusted yes
-    User $user_id
+    User $remote_user
     "
     lines+="$new_config"
 fi
@@ -43,7 +45,7 @@ Host omnode
     ForwardAgent yes
     ForwardX11 yes
     ForwardX11Trusted yes
-    User $user_id
+    User $remote_user
     "
     lines+="$new_config"
 fi

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Source the configuration variables
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 source $script_dir/constants.sh
 
-ssh $user_id@openmind.mit.edu "squeue -u $user_id"
+ssh $remote_user@$remote_login_server "squeue -u $remote_user"

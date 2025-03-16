@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Source the configuration variables
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 source $script_dir/constants.sh
@@ -10,22 +12,22 @@ node_id=""
 node_status=""
 
 SCPSCRIPT() {
-    ssh -q $user_id@openmind.mit.edu "mkdir -p $remote_script_dir"
-    scp -q $script_dir/$vscode_script $user_id@openmind.mit.edu:$remote_script_dir
-    ssh -q $user_id@openmind.mit.edu "cd $remote_script_dir && sed -i 's/\r//g' $vscode_script"
+    ssh -q $remote_user@$remote_login_server "mkdir -p $remote_script_dir"
+    scp -q $script_dir/$vscode_script $remote_user@$remote_login_server:$remote_script_dir
+    ssh -q $remote_user@$remote_login_server "cd $remote_script_dir && sed -i 's/\r//g' $vscode_script"
 }
 
 # Function definitions
 SUBMITJOB() {
     echo "Starting VSCode Server"
-    local ret=$(ssh $user_id@openmind.mit.edu "cd $remote_script_dir && sbatch -output=$vscode_out $@ $vscode_script")
+    local ret=$(ssh $remote_user@$remote_login_server "cd $remote_script_dir && sbatch -output=$vscode_out $@ $vscode_script")
     job_id=$(echo "$ret" | grep -oE '[0-9]+')
     echo "Job $job_id submitted"
 }
 
 WAITFORNODE() {
     for ((i = 0 ; i < timeout_limit ; i += 5 )); do
-        node_status=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id --format=%T --sort=-V --noheader")
+        node_status=$(ssh $remote_user@$remote_login_server "squeue -u $remote_user -j $job_id --format=%T --sort=-V --noheader")
         if [ "$node_status" == "RUNNING" ]; then
             return
         fi
@@ -36,7 +38,7 @@ WAITFORNODE() {
 }
 
 GETNODEID() {
-    node_id=$(ssh $user_id@openmind.mit.edu "squeue -u $user_id -j $job_id --format=%N --sort=-V --noheader")
+    node_id=$(ssh $remote_user@$remote_login_server "squeue -u $remote_user -j $job_id --format=%N --sort=-V --noheader")
 }
 
 # Call functions

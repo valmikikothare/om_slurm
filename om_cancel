@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Source the configuration variables
+set -e
+
 script_dir=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 source $script_dir/constants.sh
 
@@ -16,7 +17,7 @@ if [[ "$*" == *"--all"* ]]; then
     # Check if --all is the only argument
     if [ $# -eq 1 ]; then
         job_id=""
-        ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
+        ssh $remote_user@$remote_login_server "scancel -u $remote_user $job_id"
         echo "All jobs cancelled"
     else
         echo "Error: Cannot use --all with other job IDs"
@@ -25,8 +26,6 @@ if [[ "$*" == *"--all"* ]]; then
     fi
 else
     # Process multiple job IDs
-    for job_id in "$@"; do
-        ssh $user_id@openmind.mit.edu "scancel -u $user_id $job_id"
-        echo "Job $job_id cancelled"
-    done
+    ssh $remote_user@$remote_login_server "scancel -u $remote_user $@"
+    echo Jobs "$@" cancelled
 fi
